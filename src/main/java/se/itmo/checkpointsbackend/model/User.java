@@ -8,7 +8,7 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @Data
-public class UserEntity extends BaseEntity {
+public class User extends BaseEntity {
     @Column(name = "login")
     private String login;
     @Column(name = "password")
@@ -20,6 +20,6 @@ public class UserEntity extends BaseEntity {
     private List<Role> roles;
 
     @ManyToMany
-    private List<EntryEntity> entries;
+    private List<Entry> entries;
 
 }

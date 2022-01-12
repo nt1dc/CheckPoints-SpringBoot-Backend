@@ -9,7 +9,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "entries")
 @Data
-public class EntryEntity extends BaseEntity{
+public class Entry extends BaseEntity{
 
     private double x;
     private double y;
