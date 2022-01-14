@@ -10,7 +10,6 @@ import javax.persistence.Table;
 @Table(name = "entries")
 @Data
 public class Entry extends BaseEntity{
-
     private double x;
     private double y;
     private double r;

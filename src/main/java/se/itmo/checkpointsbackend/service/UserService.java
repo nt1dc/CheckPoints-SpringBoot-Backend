@@ -1,18 +1,23 @@
 package se.itmo.checkpointsbackend.service;
 
+import se.itmo.checkpointsbackend.model.Entry;
+import se.itmo.checkpointsbackend.model.Role;
 import se.itmo.checkpointsbackend.model.User;
 
 import java.util.List;
 
 public interface UserService {
-    User register(User user);
+    User saveUser(User user);
 
-    List<User> getAll();
+    Role saveRole(Role role);
 
+    void addRoleToUser(String username, String roleName);
 
-    User findByUserName(String name);
+    User getUser(String username);
 
-    User findByID(Long id);
+    List<User> getUsers();
 
-    void delete(Long id);
+    List<Entry> getUserEntries(String username);
+
+    void deleteEntriesOfUser(String username);
 }
