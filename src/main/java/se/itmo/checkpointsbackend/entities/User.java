@@ -1,4 +1,4 @@
-package se.itmo.checkpointsbackend.model;
+package se.itmo.checkpointsbackend.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,4 +27,10 @@ public class User extends BaseEntity {
 
     @ManyToMany
     private List<Entry> entries;
+
+    public User(String name, String username, String password) {
+        this.name=name;
+        this.username=username;
+        this.password=password;
+    }
 }

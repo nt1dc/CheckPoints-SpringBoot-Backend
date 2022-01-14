@@ -1,4 +1,4 @@
-package se.itmo.checkpointsbackend.model;
+package se.itmo.checkpointsbackend.entities;
 
 
 import lombok.Data;
