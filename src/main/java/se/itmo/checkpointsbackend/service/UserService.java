@@ -1,10 +1,16 @@
 package se.itmo.checkpointsbackend.service;
 
 import se.itmo.checkpointsbackend.POJO.req.AuthReq;
+import se.itmo.checkpointsbackend.dto.EntryReqDto;
 import se.itmo.checkpointsbackend.entities.Role;
 import se.itmo.checkpointsbackend.entities.User;
+import se.itmo.checkpointsbackend.exeprions.NotIncludedInTheRangeException;
+
+import java.util.List;
 
 public interface UserService {
+
+    User save(User user);
 
     User register(AuthReq authReq);
 
@@ -14,6 +20,10 @@ public interface UserService {
 
     void addRoleToUser(String username, String roleName);
 
-
     void deleteUserWithName(String username);
+
+    User getUser(String username);
+
+    List<User> getUsers();
+
 }
