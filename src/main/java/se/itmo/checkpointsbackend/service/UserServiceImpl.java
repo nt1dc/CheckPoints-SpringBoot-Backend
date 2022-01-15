@@ -2,9 +2,14 @@ package se.itmo.checkpointsbackend.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import se.itmo.checkpointsbackend.POJO.req.AuthReq;
+import se.itmo.checkpointsbackend.dto.AuthReq;
 import se.itmo.checkpointsbackend.dto.EntryReqDto;
 import se.itmo.checkpointsbackend.entities.Entry;
 import se.itmo.checkpointsbackend.entities.Role;
@@ -15,6 +20,8 @@ import se.itmo.checkpointsbackend.repository.EntryRepository;
 import se.itmo.checkpointsbackend.repository.RoleRepository;
 import se.itmo.checkpointsbackend.repository.UserRepository;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -22,12 +29,30 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final AreaChecker areaChecker;
     private final EntryRepository entryRepository;
+
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            log.error("user with name {} not found in DB", username);
+            throw new UsernameNotFoundException("user  not found in DB");
+        } else {
+            log.info("User {} found in DB", username);
+        }
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        user.getRoles().forEach(role -> {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+        });
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+    }
+
 
     @Override
     public User save(User user) {
@@ -75,13 +100,12 @@ public class UserServiceImpl implements UserService {
         user.getRoles().add(role);
     }
 
+    @Override
     public void addEntryToUser(String username, EntryReqDto entryReqDto) throws NotIncludedInTheRangeException {
         User user = userRepository.findByUsername(username);
         Entry entry = areaChecker.checkEntry(entryReqDto);
         entryRepository.save(entry);
         user.getEntries().add(entry);
-        userRepository.save(user);
-        log.info(user.toString());
     }
 
 

@@ -1,9 +1,8 @@
 package se.itmo.checkpointsbackend.dto;
 
 import lombok.Data;
-
 @Data
-public class RoleUserForm {
+public class AuthReq {
     private String username;
-    private String roleName;
+    private String password;
 }

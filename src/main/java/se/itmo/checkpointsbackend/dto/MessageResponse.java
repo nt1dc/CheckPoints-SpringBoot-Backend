@@ -1,4 +1,4 @@
-package se.itmo.checkpointsbackend.POJO.resp;
+package se.itmo.checkpointsbackend.dto;
 
 import lombok.Data;
 

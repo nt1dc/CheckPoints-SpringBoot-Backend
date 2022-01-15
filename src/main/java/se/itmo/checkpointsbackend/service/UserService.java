@@ -1,6 +1,6 @@
 package se.itmo.checkpointsbackend.service;
 
-import se.itmo.checkpointsbackend.POJO.req.AuthReq;
+import se.itmo.checkpointsbackend.dto.AuthReq;
 import se.itmo.checkpointsbackend.dto.EntryReqDto;
 import se.itmo.checkpointsbackend.entities.Role;
 import se.itmo.checkpointsbackend.entities.User;
@@ -25,5 +25,7 @@ public interface UserService {
     User getUser(String username);
 
     List<User> getUsers();
+
+    void addEntryToUser(String username, EntryReqDto entryReqDto) throws NotIncludedInTheRangeException;
 
 }
