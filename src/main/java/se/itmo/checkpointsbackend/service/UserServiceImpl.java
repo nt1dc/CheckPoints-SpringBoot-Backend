@@ -2,11 +2,11 @@ package se.itmo.checkpointsbackend.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import se.itmo.checkpointsbackend.dto.AuthReq;
@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final RoleRepository roleRepository;
     private final AreaChecker areaChecker;
     private final EntryRepository entryRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -56,6 +57,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User save(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -66,9 +68,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.save(user);
     }
 
-    @Override
-    public void login(AuthReq authReq) {
-    }
 
     @Override
     public Role saveRole(Role role) {
@@ -101,12 +100,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void addEntryToUser(String username, EntryReqDto entryReqDto) throws NotIncludedInTheRangeException {
+    public Entry addEntryToUser(String username, EntryReqDto entryReqDto) throws NotIncludedInTheRangeException {
         User user = userRepository.findByUsername(username);
         Entry entry = areaChecker.checkEntry(entryReqDto);
         entryRepository.save(entry);
         user.getEntries().add(entry);
+        return entry;
     }
-
 
 }
