@@ -45,24 +45,27 @@ public class EntriesController {
     }
 
     @GetMapping("/clear")
-    public void deleteEntries() {
+    public ResponseEntity<?> deleteEntries() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        entriesService.clear(username);
+        if (username != null) {
+            entriesService.clear(username);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
 
     @PostMapping("/check")
-    public ResponseEntity<Entry> checkEntry(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> checkEntry(@RequestBody EntryReqDto entryReqDto) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if (username == null) {
-            response.setHeader("error", "userProblem");
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("userProblem");
         }
-
         try {
-            double x = Double.parseDouble(request.getParameter("x"));
-            double y = Double.parseDouble(request.getParameter("y"));
-            double r = Double.parseDouble(request.getParameter("r"));
+            double x = entryReqDto.getX();
+            double y = entryReqDto.getY();
+            double r = entryReqDto.getR();
             Entry entry = userService.addEntryToUser(username, new EntryReqDto(x, y, r));
             return ResponseEntity.ok().body(entry);
         } catch (NotIncludedInTheRangeException e) {
