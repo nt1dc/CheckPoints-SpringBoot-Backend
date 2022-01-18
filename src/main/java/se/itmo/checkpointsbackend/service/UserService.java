@@ -6,6 +6,7 @@ import se.itmo.checkpointsbackend.entities.Entry;
 import se.itmo.checkpointsbackend.entities.Role;
 import se.itmo.checkpointsbackend.entities.User;
 import se.itmo.checkpointsbackend.exeprions.NotIncludedInTheRangeException;
+import se.itmo.checkpointsbackend.exeprions.UserAlreadyExistException;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public interface UserService {
 
     User save(User user);
 
-    User register(AuthReq authReq);
+    User register(AuthReq authReq) throws UserAlreadyExistException;
 
     Role saveRole(Role role);
 

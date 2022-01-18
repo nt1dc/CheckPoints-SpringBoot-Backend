@@ -15,6 +15,7 @@ import se.itmo.checkpointsbackend.entities.Entry;
 import se.itmo.checkpointsbackend.entities.Role;
 import se.itmo.checkpointsbackend.entities.User;
 import se.itmo.checkpointsbackend.exeprions.NotIncludedInTheRangeException;
+import se.itmo.checkpointsbackend.exeprions.UserAlreadyExistException;
 import se.itmo.checkpointsbackend.model.AreaChecker;
 import se.itmo.checkpointsbackend.repository.EntryRepository;
 import se.itmo.checkpointsbackend.repository.RoleRepository;
@@ -62,8 +63,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User register(AuthReq data) {
-        User user = new User(data.getUsername(), data.getPassword());
+    public User register(AuthReq newUser) throws UserAlreadyExistException {
+        if (userRepository.findByUsername(newUser.getUsername())!=null){
+            log.error("User {} already exist",newUser.getUsername());
+            throw new UserAlreadyExistException("User already exist");
+        }
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        User user = new User(newUser.getUsername(), newUser.getPassword());
         log.info("Saving new user {} to the db", user.getUsername());
         return userRepository.save(user);
     }

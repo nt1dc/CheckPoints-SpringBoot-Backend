@@ -60,7 +60,6 @@ public class EntriesController {
         }
 
         try {
-
             double x = Double.parseDouble(request.getParameter("x"));
             double y = Double.parseDouble(request.getParameter("y"));
             double r = Double.parseDouble(request.getParameter("r"));

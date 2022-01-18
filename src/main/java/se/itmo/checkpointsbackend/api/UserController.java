@@ -6,6 +6,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,9 +15,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import se.itmo.checkpointsbackend.dto.AuthReq;
+import se.itmo.checkpointsbackend.dto.JwtResponse;
 import se.itmo.checkpointsbackend.dto.RoleUserForm;
 import se.itmo.checkpointsbackend.entities.Role;
 import se.itmo.checkpointsbackend.entities.User;
+import se.itmo.checkpointsbackend.exeprions.UserAlreadyExistException;
 import se.itmo.checkpointsbackend.service.UserServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,18 +37,33 @@ import java.util.stream.Collectors;
 import static java.util.Arrays.stream;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+
 @Slf4j
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+//@CrossOrigin("*")
 public class UserController {
     private final UserServiceImpl userService;
+
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody AuthReq authReq) {
+        try {
+            userService.register(authReq);
+            userService.addRoleToUser(authReq.getUsername(), "ROLE_USER");
+        } catch (UserAlreadyExistException e) {
+            return ResponseEntity.status(409).body(e.getMessage());
+        }
+        return ResponseEntity.ok("registered");
+    }
 
 
     @GetMapping("/allUsers")
     public ResponseEntity<List<User>> getUsers() {
         return ResponseEntity.ok().body(userService.getUsers());
     }
+
 
     @PostMapping("/user/save")
     public ResponseEntity<User> saveUser(@RequestBody User user) {
@@ -63,9 +83,12 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+
     @GetMapping("/token/refresh")
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        log.info("refresh");
         String authorizationHeader = request.getHeader(AUTHORIZATION);
+        log.info(authorizationHeader);
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
                 String refresh_token = authorizationHeader.substring("Bearer ".length());
@@ -80,18 +103,22 @@ public class UserController {
                         .withIssuer(request.getRequestURI().toString())
                         .withClaim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
                         .sign(algorithm);
-                response.setHeader("access_token", access_token);
-                response.setHeader("refresh_token", refresh_token);
+                return ResponseEntity.ok().body(new JwtResponse(access_token, refresh_token));
             } catch (Exception e) {
+
                 log.error("ERROR LODGING IN: {} ", e.getMessage());
                 response.setHeader("error", e.getMessage());
-                response.sendError(FORBIDDEN.value());
+                try {
+                    response.sendError(FORBIDDEN.value());
+                } catch (IOException ex) {
+                    log.error(ex.getMessage());
+                }
                 response.setStatus(FORBIDDEN.value());
+                return ResponseEntity.badRequest().body(e.getMessage());
             }
-
         } else {
+            log.error("refresh token is missing");
             throw new RuntimeException("refresh token is missing");
         }
     }
-
 }
