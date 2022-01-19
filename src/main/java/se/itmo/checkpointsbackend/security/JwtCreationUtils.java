@@ -12,10 +12,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.stream.Collectors;
+
 @Slf4j
 @Component
 public class JwtCreationUtils {
-    public String createJWAccessToken(HttpServletRequest request, Authentication authentication){
+    public String createJWAccessToken(HttpServletRequest request, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         Algorithm algorithm = Algorithm.HMAC256("secret".getBytes(StandardCharsets.UTF_8));
         String access_token = com.auth0.jwt.JWT.create()
@@ -26,8 +27,8 @@ public class JwtCreationUtils {
                 .sign(algorithm);
         return access_token;
     }
-    public String createJWTRefreshToken(HttpServletRequest request, Authentication authentication){
-        log.info("create refresh");
+
+    public String createJWTRefreshToken(HttpServletRequest request, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         Algorithm algorithm = Algorithm.HMAC256("secret".getBytes(StandardCharsets.UTF_8));
         String refresh_token = JWT.create()

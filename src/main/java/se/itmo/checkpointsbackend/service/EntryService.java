@@ -32,6 +32,7 @@ public class EntryService {
 
     public void clear(String username) {
         userRepository.findByUsername(username).setEntries(new ArrayList<>());
+        entryRepository.deleteAll(userRepository.findByUsername(username).getEntries());
     }
 
     public List<Entry> getEntries() {
