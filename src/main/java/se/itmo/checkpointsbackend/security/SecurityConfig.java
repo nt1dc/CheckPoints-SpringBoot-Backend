@@ -1,6 +1,7 @@
 package se.itmo.checkpointsbackend.security;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,7 +18,7 @@ import se.itmo.checkpointsbackend.service.UserServiceImpl;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -28,8 +29,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtCreationUtils jwtCreationUtils;
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
+    protected void configure(AuthenticationManagerBuilder auth) {
+       try {
+           auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
+       }catch (Exception e){
+           log.error(e.getMessage());
+       }
     }
 
     @Override

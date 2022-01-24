@@ -3,8 +3,7 @@ package se.itmo.checkpointsbackend.service;
 
 import lombok.Data;
 import org.springframework.stereotype.Service;
-import se.itmo.checkpointsbackend.dto.EntryReqDto;
-import se.itmo.checkpointsbackend.exeprions.NotIncludedInTheRangeException;
+import org.springframework.transaction.annotation.Transactional;
 import se.itmo.checkpointsbackend.model.AreaChecker;
 import se.itmo.checkpointsbackend.entities.Entry;
 import se.itmo.checkpointsbackend.repository.EntryRepository;
@@ -16,14 +15,15 @@ import java.util.List;
 
 @Data
 @Service
-public class EntryService {
+@Transactional
+public class EntryService  {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final EntryRepository entryRepository;
     private final AreaChecker areaChecker;
 
 
-    public EntryService(UserRepository userRepository, RoleRepository roleRepository, AreaChecker areaChecker, EntryRepository entryRepository, AreaChecker areaChecker1) {
+    public EntryService(UserRepository userRepository, RoleRepository roleRepository, EntryRepository entryRepository, AreaChecker areaChecker1) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.entryRepository = entryRepository;

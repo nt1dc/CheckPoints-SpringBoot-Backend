@@ -14,8 +14,8 @@ import se.itmo.checkpointsbackend.dto.EntryReqDto;
 import se.itmo.checkpointsbackend.entities.Entry;
 import se.itmo.checkpointsbackend.entities.Role;
 import se.itmo.checkpointsbackend.entities.User;
-import se.itmo.checkpointsbackend.exeprions.NotIncludedInTheRangeException;
-import se.itmo.checkpointsbackend.exeprions.UserAlreadyExistException;
+import se.itmo.checkpointsbackend.exeptions.NotIncludedInTheRangeException;
+import se.itmo.checkpointsbackend.exeptions.UserAlreadyExistException;
 import se.itmo.checkpointsbackend.model.AreaChecker;
 import se.itmo.checkpointsbackend.repository.EntryRepository;
 import se.itmo.checkpointsbackend.repository.RoleRepository;
@@ -23,6 +23,7 @@ import se.itmo.checkpointsbackend.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 
@@ -49,9 +50,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             log.info("User {} found in DB", username);
         }
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        user.getRoles().forEach(role -> {
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
-        });
+        user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 
@@ -64,8 +63,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User register(AuthReq newUser) throws UserAlreadyExistException {
-        if (userRepository.findByUsername(newUser.getUsername())!=null){
-            log.error("User {} already exist",newUser.getUsername());
+        if (userRepository.findByUsername(newUser.getUsername()) != null) {
+            log.error("User {} already exist", newUser.getUsername());
             throw new UserAlreadyExistException("User already exist");
         }
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
@@ -107,9 +106,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public Entry addEntryToUser(String username, EntryReqDto entryReqDto) throws NotIncludedInTheRangeException {
+        long date = new Date().getTime();
         User user = userRepository.findByUsername(username);
-        Entry entry = areaChecker.checkEntry(entryReqDto);
+        Entry entry = areaChecker.checkEntry(entryReqDto, date);
+
         entryRepository.save(entry);
+
         user.getEntries().add(entry);
         return entry;
     }

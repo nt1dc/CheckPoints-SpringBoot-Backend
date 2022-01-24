@@ -5,8 +5,8 @@ import se.itmo.checkpointsbackend.dto.EntryReqDto;
 import se.itmo.checkpointsbackend.entities.Entry;
 import se.itmo.checkpointsbackend.entities.Role;
 import se.itmo.checkpointsbackend.entities.User;
-import se.itmo.checkpointsbackend.exeprions.NotIncludedInTheRangeException;
-import se.itmo.checkpointsbackend.exeprions.UserAlreadyExistException;
+import se.itmo.checkpointsbackend.exeptions.NotIncludedInTheRangeException;
+import se.itmo.checkpointsbackend.exeptions.UserAlreadyExistException;
 
 import java.util.List;
 

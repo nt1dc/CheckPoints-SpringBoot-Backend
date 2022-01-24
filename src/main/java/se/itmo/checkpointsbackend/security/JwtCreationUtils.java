@@ -21,8 +21,8 @@ public class JwtCreationUtils {
         Algorithm algorithm = Algorithm.HMAC256("secret".getBytes(StandardCharsets.UTF_8));
         String access_token = com.auth0.jwt.JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                .withIssuer(request.getRequestURI().toString())
+                .withExpiresAt(new Date(System.currentTimeMillis() + 5 * 60 * 1000))
+                .withIssuer(request.getRequestURI())
                 .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
         return access_token;
@@ -34,7 +34,7 @@ public class JwtCreationUtils {
         String refresh_token = JWT.create()
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000))
-                .withIssuer(request.getRequestURI().toString())
+                .withIssuer(request.getRequestURI())
                 .sign(algorithm);
         return refresh_token;
     }

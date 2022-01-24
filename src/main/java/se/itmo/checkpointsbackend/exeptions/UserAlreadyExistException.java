@@ -1,4 +1,4 @@
-package se.itmo.checkpointsbackend.exeprions;
+package se.itmo.checkpointsbackend.exeptions;
 
 public class UserAlreadyExistException extends Exception{
     public UserAlreadyExistException(String message) {

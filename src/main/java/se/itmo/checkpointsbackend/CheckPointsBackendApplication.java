@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import se.itmo.checkpointsbackend.dto.EntryReqDto;
 import se.itmo.checkpointsbackend.entities.Role;
 import se.itmo.checkpointsbackend.entities.User;
-import se.itmo.checkpointsbackend.service.EntryService;
 import se.itmo.checkpointsbackend.service.UserServiceImpl;
 
 @SpringBootApplication
@@ -20,7 +19,7 @@ public class CheckPointsBackendApplication {
 
 
     @Bean
-    CommandLineRunner runner(UserServiceImpl userService, EntryService entriesService) {
+    CommandLineRunner runner(UserServiceImpl userService) {
         return args -> {
             userService.saveRole(new Role("ROLE_USER"));
             userService.saveRole(new Role("ROLE_ADMIN"));
@@ -33,7 +32,6 @@ public class CheckPointsBackendApplication {
             userService.addEntryToUser("username", new EntryReqDto(1, 2, 3));
         };
     }
-
 
     @Bean
     PasswordEncoder passwordEncoder() {

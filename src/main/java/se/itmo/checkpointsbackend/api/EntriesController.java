@@ -8,10 +8,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import se.itmo.checkpointsbackend.dto.EntryReqDto;
 import se.itmo.checkpointsbackend.entities.Entry;
-import se.itmo.checkpointsbackend.exeprions.NotIncludedInTheRangeException;
+import se.itmo.checkpointsbackend.exeptions.NotIncludedInTheRangeException;
 import se.itmo.checkpointsbackend.service.EntryService;
 import se.itmo.checkpointsbackend.service.UserServiceImpl;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -50,8 +51,9 @@ public class EntriesController {
     }
 
     @PostMapping("/check")
-    public ResponseEntity<?> checkEntry(@RequestBody EntryReqDto entryReqDto) {
+    public   ResponseEntity<?> checkEntry(@Valid @RequestBody EntryReqDto entryReqDto) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("{} try to check entry", username);
         if (username == null) {
             return ResponseEntity.badRequest().body("userProblem");
         }
@@ -60,6 +62,8 @@ public class EntriesController {
             return ResponseEntity.ok().body(entry);
         } catch (NotIncludedInTheRangeException e) {
             return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(504).body("too much requests");
         }
     }
 }

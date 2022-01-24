@@ -7,6 +7,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import se.itmo.checkpointsbackend.dto.AuthReq;
@@ -14,11 +15,12 @@ import se.itmo.checkpointsbackend.dto.JwtResponse;
 import se.itmo.checkpointsbackend.dto.RoleUserForm;
 import se.itmo.checkpointsbackend.entities.Role;
 import se.itmo.checkpointsbackend.entities.User;
-import se.itmo.checkpointsbackend.exeprions.UserAlreadyExistException;
+import se.itmo.checkpointsbackend.exeptions.UserAlreadyExistException;
 import se.itmo.checkpointsbackend.service.UserServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -39,12 +41,19 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody AuthReq authReq) {
+    public ResponseEntity<?> register(@Valid @RequestBody AuthReq authReq, BindingResult bindResult, HttpServletResponse response) {
+        if (authReq.getUsername() == null || authReq.getUsername().length() < 2 || authReq.getPassword() == null || authReq.getPassword().length() < 2) {
+            log.error("Bad req");
+            return ResponseEntity.badRequest().body("bad req");
+        }
         try {
             userService.register(authReq);
             userService.addRoleToUser(authReq.getUsername(), "ROLE_USER");
         } catch (UserAlreadyExistException e) {
+            response.addHeader("error", "already exist");
             return ResponseEntity.status(409).body(e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
         return ResponseEntity.ok("registered");
     }
@@ -79,7 +88,6 @@ public class UserController {
     public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         log.info("refresh");
         String authorizationHeader = request.getHeader(AUTHORIZATION);
-        log.info(authorizationHeader);
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
                 String refresh_token = authorizationHeader.substring("Bearer ".length());
@@ -91,13 +99,12 @@ public class UserController {
                 String access_token = JWT.create()
                         .withSubject(user.getUsername())
                         .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                        .withIssuer(request.getRequestURI().toString())
+                        .withIssuer(request.getRequestURI())
                         .withClaim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
                         .sign(algorithm);
                 return ResponseEntity.ok().body(new JwtResponse(access_token, refresh_token));
             } catch (Exception e) {
-
-                log.error("ERROR LODGING IN: {} ", e.getMessage());
+                log.error("ERROR OF REFRESH IN: {} ", e.getMessage());
                 response.setHeader("error", e.getMessage());
                 try {
                     response.sendError(FORBIDDEN.value());

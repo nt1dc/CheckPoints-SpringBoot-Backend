@@ -1,7 +1,9 @@
 package se.itmo.checkpointsbackend.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import javax.persistence.GeneratedValue;
@@ -17,8 +19,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Override
