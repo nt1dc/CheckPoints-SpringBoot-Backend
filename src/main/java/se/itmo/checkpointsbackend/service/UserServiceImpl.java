@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public void deleteUserWithName(String username) {
-        userRepository.deleteById(userRepository.findByUsername(username).getId());
+        userRepository.deleteUserByUsername(username);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public List<User> getUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 

@@ -24,7 +24,7 @@ public interface UserService {
 
     User getUser(String username);
 
-    List<User> getUsers();
+    List<User> getAllUsers();
 
     Entry addEntryToUser(String username, EntryReqDto entryReqDto) throws NotIncludedInTheRangeException;
 

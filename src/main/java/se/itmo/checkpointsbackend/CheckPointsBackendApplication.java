@@ -17,21 +17,21 @@ public class CheckPointsBackendApplication {
         SpringApplication.run(CheckPointsBackendApplication.class, args);
     }
 
-
-    @Bean
-    CommandLineRunner runner(UserServiceImpl userService) {
-        return args -> {
-            userService.saveRole(new Role("ROLE_USER"));
-            userService.saveRole(new Role("ROLE_ADMIN"));
-            userService.save(new User("username", "password"));
-            userService.save(new User("test", "test"));
-            userService.addRoleToUser("username", "ROLE_ADMIN");
-            userService.addRoleToUser("test", "ROLE_ADMIN");
-            userService.addEntryToUser("username", new EntryReqDto(1, 2, 3));
-            userService.addEntryToUser("username", new EntryReqDto(1, 2, 3));
-            userService.addEntryToUser("username", new EntryReqDto(1, 2, 3));
-        };
-    }
+//
+//    @Bean
+//    CommandLineRunner runner(UserServiceImpl userService) {
+//        return args -> {
+//            userService.saveRole(new Role("ROLE_USER"));
+//            userService.saveRole(new Role("ROLE_ADMIN"));
+//            userService.save(new User("username", "password"));
+//            userService.save(new User("test", "test"));
+//            userService.addRoleToUser("username", "ROLE_ADMIN");
+//            userService.addRoleToUser("test", "ROLE_ADMIN");
+//            userService.addEntryToUser("username", new EntryReqDto(1, 2, 3));
+//            userService.addEntryToUser("username", new EntryReqDto(1, 2, 3));
+//            userService.addEntryToUser("username", new EntryReqDto(1, 2, 3));
+//        };
+//    }
 
     @Bean
     PasswordEncoder passwordEncoder() {
